@@ -17,6 +17,8 @@ class MoviesImportCommand extends Command
 
     public function handle(): int
     {
+        // dry run
+
         $delimiter = ',';
 
         $handle = fopen('movies.csv', 'r');
