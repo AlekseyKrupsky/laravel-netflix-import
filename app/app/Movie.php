@@ -11,6 +11,8 @@ class Movie extends Model
 {
     use Filterable;
 
+    public $timestamps = false;
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);

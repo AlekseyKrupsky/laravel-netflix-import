@@ -10,6 +10,10 @@ class Review extends Model
 {
     use Filterable;
 
+    public $timestamps = false;
+
+    protected $guarded = ['id'];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
