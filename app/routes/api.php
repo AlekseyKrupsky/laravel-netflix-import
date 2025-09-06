@@ -1,26 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
-use App\Http\Resources\MovieResource;
-use App\Http\Resources\UserResource;
-use App\Movie;
-use App\User;
 use Illuminate\Support\Facades\Route;
 
-// move to controllers
-Route::get('/movies/{id}', function (string $id) {
-    return new MovieResource(Movie::with('reviews', 'users')->findOrFail($id));
+Route::group(['prefix' => '/movies'], function () {
+    Route::get('/', [MovieController::class, 'index']);
+    Route::get('/{id}', [MovieController::class, 'details']);
 });
 
-Route::get('/movies', [MovieController::class, 'index']);
-
-Route::get('/users/{id}', function (string $id) {
-    return new UserResource(User::with('reviews', 'movies')->findOrFail($id));
+Route::group(['prefix' => '/users'], function () {
+    Route::get('/', [UserController::class, 'index']);
+    Route::get('/{id}', [UserController::class, 'details']);
 });
-
-Route::get('/users', [UserController::class, 'index']);
 
 Route::group(['prefix' => '/reviews'], function () {
     Route::get('/', [ReviewController::class, 'index']);
