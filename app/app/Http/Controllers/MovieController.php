@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Filters\MovieFilter;
-use App\Http\Resources\MovieResource;
+use App\Http\Resources\MovieCollection;
 use App\Movie;
 
 class MovieController extends Controller
 {
-    public function index(MovieFilter $filter): MovieResource
+    public function index(MovieFilter $filter): MovieCollection
     {
-        return new MovieResource(Movie::filter($filter)->paginate());
+        return new MovieCollection(Movie::filter($filter)->paginate());
     }
 
 //    /**

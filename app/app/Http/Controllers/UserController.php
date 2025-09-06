@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Filters\UserFilter;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\UserCollection;
 use App\User;
 
 class UserController extends Controller
 {
-    public function index(UserFilter $filter): UserResource
+    public function index(UserFilter $filter): UserCollection
     {
-        return new UserResource(User::filter($filter)->paginate());
+        return new UserCollection(User::filter($filter)->paginate());
     }
 }
