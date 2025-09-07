@@ -10,7 +10,9 @@ git clone git@github.com:AlekseyKrupsky/laravel-netflix-import.git
 ```
 
 - Copy env file and fill it with values
-> cd laravel-netflix-import && cp .env.example .env
+```
+cd laravel-netflix-import && cp .env.example .env
+```
 
 ### Env file content
 ```
@@ -38,14 +40,22 @@ LOCAL_DB_PORT=
 ```
 
 - Run application
-> docker-compose build && docker-compose up
+```
+docker-compose build && docker-compose up
+```
 
 - Install composer dependencies and dump autoload
-> docker exec netflix_phpfpm composer install
-> docker exec netflix_phpfpm composer dump-autoload
+```
+docker exec netflix_phpfpm composer install
+```
+```
+docker exec netflix_phpfpm composer dump-autoload
+```
 
 - Run migrations
-> docker exec netflix_phpfpm php artisan migrate:fresh
+```
+docker exec netflix_phpfpm php artisan migrate:fresh
+```
 
 ## Import data
 
@@ -56,18 +66,26 @@ You should import movies and users first, because reviews have foreign fields fr
 
 Import commands support dry-run mode. In this case script only read files and make some validations
 without saving date to database. Example:
-> docker exec netflix_phpfpm php artisan app:movies-import --dry-run
+```
+docker exec netflix_phpfpm php artisan app:movies-import --dry-run
+```
 
 Commands to import data to DB:
 
 - Import movies
-> docker exec netflix_phpfpm php artisan app:movies-import
+```
+docker exec netflix_phpfpm php artisan app:movies-import
+```
 
 - Import users
-> docker exec netflix_phpfpm php artisan app:users-import
+```
+docker exec netflix_phpfpm php artisan app:users-import
+```
 
 - Import reviews
-> docker exec netflix_phpfpm php artisan app:reviews-import
+```
+docker exec netflix_phpfpm php artisan app:reviews-import
+```
 
 ## REST API documentation 
 
@@ -75,9 +93,13 @@ Commands to import data to DB:
 
 - List of users. Support pagination and filtration (`id`, `email`, `first_name`, `last_name`, `age`, `gender`).
 - Field `id` support multiple value
+
 > http://localhost:8080/api/users
+> 
 > http://localhost:8080/api/users?page=2
+> 
 > http://localhost:8080/api/users?email=adkinsbrian@example.net
+> 
 > http://localhost:8080/api/users?id=1,2,3,4
 
 - User details. Include related movies and reviews.
@@ -87,9 +109,13 @@ Commands to import data to DB:
 
 - List of movies. Support pagination and filtration (`id`, `title`, `genre`, `genre_secondary`, `year`).
 - Field `id` support multiple value
+
 > http://localhost:8080/api/movies
+> 
 > http://localhost:8080/api/movies?page=2
+> 
 > http://localhost:8080/api/movies?genre=History&year=2009
+> 
 > http://localhost:8080/api/movies?id=1,2,3,4
 
 - Movie details. Include related users and reviews.
@@ -99,11 +125,17 @@ Commands to import data to DB:
 
 - List of reviews. Support pagination and filtration (`id`, `user`, `movie`, `review_date`, `device_type`, `is_verified_watch`).
 - Field `id` support multiple value
+
 > http://localhost:8080/api/reviews
+> 
 > http://localhost:8080/api/reviews?page=2
+> 
 > http://localhost:8080/api/reviews?user=1
+> 
 > http://localhost:8080/api/reviews?id=1,2,3,4
+> 
 > http://localhost:8080/api/reviews?is_verified_watch=false
+> 
 > http://localhost:8080/api/reviews?is_verified_watch=true
 
 - Review details. Include related movie and user.
