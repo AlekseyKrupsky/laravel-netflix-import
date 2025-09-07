@@ -22,13 +22,14 @@ class MoviesImportCommand extends AbstractNetflixImportCommand
 
     protected function getValidatedBatch(): array
     {
-        $duplicatedIds = $this->getDuplicatedInsertKeys('movies', 'id');
+        $duplicatedIdsInBatch = $this->filterUniqueInsertsByField('id');
+        $duplicatedIds = $this->getDuplicatedInsertKeysInDatabase('movies', 'id');
 
-        foreach ($duplicatedIds as $duplicatedId) {
+        foreach (array_merge($duplicatedIds, $duplicatedIdsInBatch) as $duplicatedId) {
             $this->warn(sprintf('Skip row with duplicated id: %s', $duplicatedId));
         }
 
-        return array_filter($this->inserts, fn ($item) => !in_array($item['id'], $duplicatedIds));
+        return array_filter($this->inserts, static fn ($item) => !in_array($item['id'], $duplicatedIds));
     }
 
     protected function mapRowData(array $data): array

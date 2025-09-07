@@ -24,9 +24,10 @@ class ReviewsImportCommand extends AbstractNetflixImportCommand
 
     protected function getValidatedBatch(): array
     {
-        $duplicatedIds = $this->getDuplicatedInsertKeys('reviews', 'id');
+        $duplicatedIdsInBatch = $this->filterUniqueInsertsByField('id');
+        $duplicatedIds = $this->getDuplicatedInsertKeysInDatabase('reviews', 'id');
 
-        foreach ($duplicatedIds as $duplicatedId) {
+        foreach (array_merge($duplicatedIds, $duplicatedIdsInBatch) as $duplicatedId) {
             $this->warn(sprintf('Skip row with duplicated id: %s', $duplicatedId));
         }
 
@@ -43,7 +44,7 @@ class ReviewsImportCommand extends AbstractNetflixImportCommand
 
         return array_filter(
             $this->inserts,
-            fn (array $item) =>
+            static fn (array $item) =>
                 !in_array($item['id'], $duplicatedIds)
                 && !in_array($item['user_id'], $notExistedUsers)
                 && !in_array($item['movie_id'], $notExistedMovies)

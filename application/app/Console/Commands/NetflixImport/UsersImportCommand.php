@@ -22,37 +22,26 @@ class UsersImportCommand extends AbstractNetflixImportCommand
 
     protected function getValidatedBatch(): array
     {
-        $duplicatedIds = $this->getDuplicatedInsertKeys('users', 'id');
+        $duplicatedIdsInBatch = $this->filterUniqueInsertsByField('id');
+        $duplicatedEmailsInBatch = $this->filterUniqueInsertsByField('email');
 
-        foreach ($duplicatedIds['database'] as $duplicatedId) {
+        $duplicatedIds = $this->getDuplicatedInsertKeysInDatabase('users', 'id');
+        $duplicatedEmails = $this->getDuplicatedInsertKeysInDatabase('users', 'email');
+
+        foreach (array_merge($duplicatedIds, $duplicatedIdsInBatch) as $duplicatedId) {
             $this->warn(sprintf('Skip row with duplicated id: %s', $duplicatedId));
         }
 
-        $duplicatedEmails = $this->getDuplicatedInsertKeys('users', 'email');
-
-        foreach ($duplicatedEmails['database'] as $duplicatedEmail) {
+        foreach (array_merge($duplicatedEmails, $duplicatedEmailsInBatch) as $duplicatedEmail) {
             $this->warn(sprintf('Skip row with duplicated email: %s', $duplicatedEmail));
         }
 
-        // unique in batch issue !!
-
-//        return array_filter(
-//            $this->inserts,
-//            static function (array $item) use (&$duplicatedIds, $duplicatedEmails) {
-//                if (
-//                    in_array($item['id'], $duplicatedIds['database'])
-//                    || in_array($item['email'], $duplicatedEmails['database'])
-//                ) {
-//                    return false;
-//                }
-//
-//                if (in_array($duplicatedIds['batch'])) {
-//
-//                }
-//            }
-//        );
-
-        return [];
+        return array_filter(
+            $this->inserts,
+            static fn ($item) =>
+                !in_array($item['id'], $duplicatedIds)
+                && !in_array($item['email'], $duplicatedEmails)
+        );
     }
 
     protected function mapRowData(array $data): array

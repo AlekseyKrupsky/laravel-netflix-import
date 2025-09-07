@@ -29,7 +29,7 @@ abstract class AbstractNetflixImportCommand extends Command
 
     public function handle(): int
     {
-        // service csv opener !
+        // TODO: move to service csv reader ?
         $delimiter = ',';
 
         $filePath = sprintf('%s/%s', self::IMPORT_FILE_DIR_NAME, $this->getFileName());
@@ -75,20 +75,33 @@ abstract class AbstractNetflixImportCommand extends Command
     }
 
     #[ArrayShape(['database' => "array", 'batch' => "array"])]
-    protected function getDuplicatedInsertKeys(string $table, string $field): array
+    protected function getDuplicatedInsertKeysInDatabase(string $table, string $field): array
     {
         $items = array_column($this->inserts, $field);
 
-        $uniqueItems = array_unique($items, SORT_NUMERIC);
+        return DB::table($table)->select($field)->whereIn($field, $items)->pluck($field)->toArray();
+    }
 
-        $duplicatesFromDB = DB::table($table)->select($field)->whereIn($field, $uniqueItems)->pluck($field)->toArray();
+    protected function filterUniqueInsertsByField(string $field): array
+    {
+        $items = array_column($this->inserts, $field);
+        $uniqueItems = array_values(array_unique($items));
 
-        return $duplicatesFromDB;
+        $duplicated = array_diff($items, $uniqueItems);
 
-//        return [
-//            'database' => $duplicatesFromDB,
-//            'batch' => array_diff($items, $uniqueItems),
-//        ];
+        $this->inserts = array_filter($this->inserts, function (array $row) use ($field, &$uniqueItems) {
+            if (in_array($row[$field], $uniqueItems)) {
+                $key = array_search($row[$field], $uniqueItems);
+
+                unset($uniqueItems[$key]);
+
+                return true;
+            }
+
+            return false;
+        });
+
+        return $duplicated;
     }
 
     private function insertRows(): void
