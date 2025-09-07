@@ -49,6 +49,6 @@ class ReviewFilter extends Filter
 
     protected function isVerifiedWatch(string $value): Builder
     {
-        return $this->getBuilder()->where('is_verified_watch', $value);
+        return $this->getBuilder()->where('is_verified_watch', $value === 'true');
     }
 }

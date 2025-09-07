@@ -34,6 +34,7 @@ class MoviesImportCommand extends AbstractNetflixImportCommand
 
     protected function mapRowData(array $data): array
     {
+        // TODO DTO + validation
         return [
             'id' => intval(str_replace(self::MOVIE_ID_PREFIX, '', $data[0])),
             'title' => $data[1],

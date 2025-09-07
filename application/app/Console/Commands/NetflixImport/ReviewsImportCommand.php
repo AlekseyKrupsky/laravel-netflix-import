@@ -53,6 +53,7 @@ class ReviewsImportCommand extends AbstractNetflixImportCommand
 
     protected function mapRowData(array $data): array
     {
+        // TODO DTO + validation
         return [
             'id' => intval(str_replace(self::REVIEW_ID_PREFIX, '', $data[0])),
             'user_id' => intval(str_replace(self::USER_ID_PREFIX, '', $data[1])),

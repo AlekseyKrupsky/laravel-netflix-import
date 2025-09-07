@@ -67,7 +67,81 @@ Commands to import data to DB:
 - Import reviews
 > docker exec netflix_phpfpm php artisan app:reviews-import
 
-## Api
+## REST API documentation 
 
+### Users
 
+- List of users. Support pagination and filtration (`id`, `email`, `first_name`, `last_name`, `age`, `gender`).
+- Field `id` support multiple value
+> http://localhost:8080/api/users
+> http://localhost:8080/api/users?page=2
+> http://localhost:8080/api/users?email=adkinsbrian@example.net
+> http://localhost:8080/api/users?id=1,2,3,4
 
+- User details. Include related movies and reviews.
+> http://localhost:8080/api/users/1
+
+### Movies
+
+- List of movies. Support pagination and filtration (`id`, `title`, `genre`, `genre_secondary`, `year`).
+- Field `id` support multiple value
+> http://localhost:8080/api/movies
+> http://localhost:8080/api/movies?page=2
+> http://localhost:8080/api/movies?genre=History&year=2009
+> http://localhost:8080/api/movies?id=1,2,3,4
+
+- Movie details. Include related users and reviews.
+> http://localhost:8080/api/movies/1
+
+### Reviews
+
+- List of reviews. Support pagination and filtration (`id`, `user`, `movie`, `review_date`, `device_type`, `is_verified_watch`).
+- Field `id` support multiple value
+> http://localhost:8080/api/reviews
+> http://localhost:8080/api/reviews?page=2
+> http://localhost:8080/api/reviews?user=1
+> http://localhost:8080/api/reviews?id=1,2,3,4
+> http://localhost:8080/api/reviews?is_verified_watch=false
+> http://localhost:8080/api/reviews?is_verified_watch=true
+
+- Review details. Include related movie and user.
+> http://localhost:8080/api/reviews/1
+
+- Add new review. Return response with status code 201.
+```
+curl --location --request POST 'localhost:8081/api/reviews' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "user_id": 123,
+    "movie_id": 321,
+    "rating": 4,
+    "review_date": "2021-11-23",
+    "device_type": "Mobile",
+    "is_verified_watch": true,
+    "helpful_votes": 7,
+    "total_votes": 6,
+    "review_text": "Reviews",
+    "sentiment": "positive",
+    "sentiment_score": "0.678"
+}'
+```
+
+- Update review with given `id`. On success return status code 200.
+
+```
+curl --location --request PATCH 'localhost:8081/api/reviews/1' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "rating": 3,
+    "review_date": "2021-11-23",
+    "device_type": "Laptop"
+}'
+```
+
+- Delete review by `id`. On success return status code 204 without content.
+
+```
+curl --location --request DELETE 'localhost:8081/api/reviews/1'
+```

@@ -55,6 +55,7 @@ class UsersImportCommand extends AbstractNetflixImportCommand
             $age = null;
         }
 
+        // TODO DTO + validation
         return [
             'id' => $id,
             'email' => $data[1],
