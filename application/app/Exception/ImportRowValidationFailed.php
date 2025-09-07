@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-class ImportFileReadException extends \Exception
+class ImportRowValidationFailed extends \Exception
 {
 }

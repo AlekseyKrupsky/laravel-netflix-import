@@ -44,7 +44,15 @@ abstract class AbstractNetflixImportCommand extends Command
                     break;
                 }
 
-                $this->inserts[] = $this->mapRowData($row);
+                try {
+                    $this->inserts[] = $this->mapRowData($row);
+                } catch (\Throwable $exception) {
+                    $this->error(sprintf('Unable to map row. Error: %s', $exception->getMessage()));
+
+                    $this->processed += 1;
+
+                    continue;
+                }
 
                 if (count($this->inserts) === self::BATCH_SIZE) {
                     $this->insertRows();
