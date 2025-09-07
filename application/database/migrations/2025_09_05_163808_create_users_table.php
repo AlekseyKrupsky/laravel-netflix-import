@@ -24,7 +24,7 @@ return new class extends Migration
             $table->decimal('monthly_spend', 6)->nullable();
             $table->enum('primary_device', ['Desktop', 'Tablet', 'Laptop', 'Gaming Console', 'Mobile', 'Smart TV']);
             $table->unsignedTinyInteger('household_size')->nullable();
-            $table->dateTime('created_at'); // microseconds ??
+            $table->dateTime('created_at');
         });
     }
 

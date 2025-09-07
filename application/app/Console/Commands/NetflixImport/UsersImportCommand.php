@@ -24,28 +24,41 @@ class UsersImportCommand extends AbstractNetflixImportCommand
     {
         $duplicatedIds = $this->getDuplicatedInsertKeys('users', 'id');
 
-        foreach ($duplicatedIds as $duplicatedId) {
+        foreach ($duplicatedIds['database'] as $duplicatedId) {
             $this->warn(sprintf('Skip row with duplicated id: %s', $duplicatedId));
         }
 
         $duplicatedEmails = $this->getDuplicatedInsertKeys('users', 'email');
 
-        foreach ($duplicatedEmails as $duplicatedEmail) {
+        foreach ($duplicatedEmails['database'] as $duplicatedEmail) {
             $this->warn(sprintf('Skip row with duplicated email: %s', $duplicatedEmail));
         }
 
-        return array_filter(
-            $this->inserts,
-            static fn ($item) =>
-                !in_array($item['id'], $duplicatedIds)
-                && !in_array($item['email'], $duplicatedEmails)
-        );
+        // unique in batch issue !!
+
+//        return array_filter(
+//            $this->inserts,
+//            static function (array $item) use (&$duplicatedIds, $duplicatedEmails) {
+//                if (
+//                    in_array($item['id'], $duplicatedIds['database'])
+//                    || in_array($item['email'], $duplicatedEmails['database'])
+//                ) {
+//                    return false;
+//                }
+//
+//                if (in_array($duplicatedIds['batch'])) {
+//
+//                }
+//            }
+//        );
+
+        return [];
     }
 
     protected function mapRowData(array $data): array
     {
         $age = $data[4] ?: null;
-        $id = intval(str_replace('user_', '', $data[0]));
+        $id = intval(str_replace(self::USER_ID_PREFIX, '', $data[0]));
 
         if ($age !== null && $age < 0) {
             $this->warn(sprintf('Invalid age (%s) fallback to null. Row id: %s', $age, $id));
@@ -65,7 +78,7 @@ class UsersImportCommand extends AbstractNetflixImportCommand
             'city' => $data[8],
             'subscription_plan' => $data[9],
             'subscription_start_date' => $data[10],
-            'is_active' => $data[11] === 'True',
+            'is_active' => $data[11] === self::TRUE_VALUE,
             'monthly_spend' => $data[12] ?: null,
             'primary_device' => $data[13],
             'household_size' => $data[14] ?: null,

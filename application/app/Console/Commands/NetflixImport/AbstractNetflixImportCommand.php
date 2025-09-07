@@ -7,6 +7,7 @@ namespace App\Console\Commands\NetflixImport;
 use App\Exception\ImportFileReadException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use JetBrains\PhpStorm\ArrayShape;
 
 abstract class AbstractNetflixImportCommand extends Command
 {
@@ -16,7 +17,9 @@ abstract class AbstractNetflixImportCommand extends Command
 
     protected const TRUE_VALUE = 'True';
 
-    protected const BATCH_SIZE = 500;
+    private const IMPORT_FILE_DIR_NAME = 'import';
+
+    private const BATCH_SIZE = 500;
     protected const DELIMITER = ',';
 
     protected array $inserts = [];
@@ -29,11 +32,13 @@ abstract class AbstractNetflixImportCommand extends Command
         // service csv opener !
         $delimiter = ',';
 
-        $handle = fopen($this->getFileName(), 'r');
+        $filePath = sprintf('%s/%s', self::IMPORT_FILE_DIR_NAME, $this->getFileName());
+
+        $handle = fopen($filePath, 'r');
 
         try {
             if ($handle === false) {
-                throw new ImportFileReadException(sprintf('Unable to open file: %s', $this->getFileName()));
+                throw new ImportFileReadException(sprintf('Unable to open file: %s', $filePath));
             }
 
             // Skip headers
@@ -51,13 +56,15 @@ abstract class AbstractNetflixImportCommand extends Command
                 $this->insertRows();
             }
         } catch (\Throwable $exception) {
-            $this->error($exception->getMessage());
+            $this->error(sprintf('Export has failed. Error: %s', $exception->getMessage()));
+
+            $this->info(sprintf('Processed total: %d', $this->processed));
+            $this->info(sprintf('Inserted total: %d', $this->inserted));
 
             return 1;
         } finally {
             fclose($handle);
         }
-
 
         $this->line('');
         $this->info('SUCCESS!');
@@ -67,11 +74,21 @@ abstract class AbstractNetflixImportCommand extends Command
         return 0;
     }
 
+    #[ArrayShape(['database' => "array", 'batch' => "array"])]
     protected function getDuplicatedInsertKeys(string $table, string $field): array
     {
         $items = array_column($this->inserts, $field);
 
-        return DB::table($table)->select($field)->whereIn($field, $items)->pluck($field)->toArray();
+        $uniqueItems = array_unique($items, SORT_NUMERIC);
+
+        $duplicatesFromDB = DB::table($table)->select($field)->whereIn($field, $uniqueItems)->pluck($field)->toArray();
+
+        return $duplicatesFromDB;
+
+//        return [
+//            'database' => $duplicatesFromDB,
+//            'batch' => array_diff($items, $uniqueItems),
+//        ];
     }
 
     private function insertRows(): void

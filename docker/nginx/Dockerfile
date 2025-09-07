@@ -1,3 +1,3 @@
 FROM nginx:alpine
 
-WORKDIR /var/www/html/app
+WORKDIR /var/www/html
