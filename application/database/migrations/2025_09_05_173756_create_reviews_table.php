@@ -1,7 +1,7 @@
 <?php
 
-use App\Enum\DeviceType;
-use App\Enum\Sentiment;
+use App\Enum\Review\DeviceType;
+use App\Enum\Review\Sentiment;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

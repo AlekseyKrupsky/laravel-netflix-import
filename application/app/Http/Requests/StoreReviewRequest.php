@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use App\Enum\DeviceType;
-use App\Enum\Sentiment;
+use App\Enum\Review\DeviceType;
+use App\Enum\Review\Sentiment;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

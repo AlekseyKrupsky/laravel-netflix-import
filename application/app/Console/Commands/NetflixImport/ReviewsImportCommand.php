@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands\NetflixImport;
 
-use App\Enum\DeviceType;
-use App\Enum\Sentiment;
+use App\Enum\Review\DeviceType;
+use App\Enum\Review\Sentiment;
 use App\Exception\ImportRowValidationFailed;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
