@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands\NetflixImport;
 
-use App\Exception\ImportFileReadException;
+use App\Service\CsvFileReader;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -19,32 +19,31 @@ abstract class AbstractNetflixImportCommand extends Command
     private const IMPORT_FILE_DIR_NAME = 'import';
 
     private const BATCH_SIZE = 500;
-    protected const DELIMITER = ',';
 
     protected array $inserts = [];
 
     protected int $processed = 0;
     protected int $inserted = 0;
 
+    public function __construct(private readonly CsvFileReader $csvFileReader)
+    {
+        parent::__construct();
+    }
+
     public function handle(): int
     {
-        // TODO: move to service csv reader ?
-        $delimiter = ',';
-
         $filePath = sprintf('%s/%s', self::IMPORT_FILE_DIR_NAME, $this->getFileName());
 
-        $handle = fopen($filePath, 'r');
-
         try {
-            if ($handle === false) {
-                throw new ImportFileReadException(sprintf('Unable to open file: %s', $filePath));
-            }
+            $this->csvFileReader->openFile($filePath);
+            $this->csvFileReader->skipLine();
 
-            // Skip headers
-            fgetcsv($handle, 0, $delimiter);
+            foreach ($this->csvFileReader->getRows() as $row) {
+                if (!$row) {
+                    break;
+                }
 
-            while (($data = fgetcsv($handle, 0, self::DELIMITER)) !== false) {
-                $this->inserts[] = $this->mapRowData($data);
+                $this->inserts[] = $this->mapRowData($row);
 
                 if (count($this->inserts) === self::BATCH_SIZE) {
                     $this->insertRows();
@@ -62,7 +61,7 @@ abstract class AbstractNetflixImportCommand extends Command
 
             return 1;
         } finally {
-            fclose($handle);
+            $this->csvFileReader->closeFileIfOpened();
         }
 
         $this->line('');

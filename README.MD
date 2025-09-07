@@ -5,7 +5,9 @@ It also provides REST API to work with imported data.
 ## How to run import
 
 - Clone the project
-> git clone git@github.com:AlekseyKrupsky/laravel-netflix-import.git
+``` 
+git clone git@github.com:AlekseyKrupsky/laravel-netflix-import.git
+```
 
 - Copy env file and fill it with values
 > cd laravel-netflix-import && cp .env.example .env
@@ -14,7 +16,7 @@ It also provides REST API to work with imported data.
 ```
 APP_NAME=Netflix dataset import
 APP_ENV=local
-# Will be generated automatically
+# Add secure string here
 APP_KEY=
 APP_DEBUG=true
 APP_URL=http://localhost:8081
