@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('is_verified_watch');
             $table->unsignedSmallInteger('helpful_votes')->nullable();
             $table->unsignedSmallInteger('total_votes')->nullable();
-            $table->string('review_text');
+            $table->string('review_text')->nullable();
             $table->enum('sentiment', [Sentiment::Positive, Sentiment::Neutral, Sentiment::Negative]);
             $table->decimal('sentiment_score', 4, 3)->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

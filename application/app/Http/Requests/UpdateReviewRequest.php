@@ -28,11 +28,11 @@ class UpdateReviewRequest extends FormRequest
             'review_date' => 'date',
             'device_type' => [Rule::enum(DeviceType::class)],
             'is_verified_watch' => 'boolean',
-            'helpful_votes' => 'integer|min:0|max:65535',
-            'total_votes' => 'integer|min:0|max:65535',
-            'review_text' => 'string|max:255',
+            'helpful_votes' => 'nullable|integer|min:0|max:65535',
+            'total_votes' => 'nullable|integer|min:0|max:65535',
+            'review_text' => 'nullable|string|max:255',
             'sentiment' => [Rule::enum(Sentiment::class)],
-            'sentiment_score' => [Rule::numeric()->min(0.000)->max(1.000)->decimal(3)],
+            'sentiment_score' => ['nullable', Rule::numeric()->min(0.000)->max(1.000)->decimal(0, 3)],
         ];
     }
 }
