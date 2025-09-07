@@ -127,7 +127,7 @@ curl --location --request POST 'localhost:8081/api/reviews' \
 }'
 ```
 
-- Update review with given `id`. On success return status code 200.
+- Update review with given `id`. Can be updated any number of fields. On success return status code 200.
 
 ```
 curl --location --request PATCH 'localhost:8081/api/reviews/1' \

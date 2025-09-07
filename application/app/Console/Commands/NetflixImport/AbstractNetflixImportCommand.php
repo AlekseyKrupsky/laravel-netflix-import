@@ -7,7 +7,6 @@ namespace App\Console\Commands\NetflixImport;
 use App\Exception\ImportFileReadException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use JetBrains\PhpStorm\ArrayShape;
 
 abstract class AbstractNetflixImportCommand extends Command
 {
@@ -74,7 +73,6 @@ abstract class AbstractNetflixImportCommand extends Command
         return 0;
     }
 
-    #[ArrayShape(['database' => "array", 'batch' => "array"])]
     protected function getDuplicatedInsertKeysInDatabase(string $table, string $field): array
     {
         $items = array_column($this->inserts, $field);
