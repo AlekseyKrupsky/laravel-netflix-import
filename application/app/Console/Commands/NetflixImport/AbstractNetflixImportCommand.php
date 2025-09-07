@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands\NetflixImport;
 
-use App\Service\CsvFileReader;
+use App\Service\FileReader\CsvFileReader;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -32,13 +32,14 @@ abstract class AbstractNetflixImportCommand extends Command
 
     public function handle(): int
     {
-        $filePath = sprintf('%s/%s', self::IMPORT_FILE_DIR_NAME, $this->getFileName());
-
         try {
-            $this->csvFileReader->openFile($filePath);
-            $this->csvFileReader->skipLine();
+            $filePath = sprintf('%s/%s', self::IMPORT_FILE_DIR_NAME, $this->getFileName());
 
-            foreach ($this->csvFileReader->getRows() as $row) {
+            $options = [
+                'skip_headers' => true,
+            ];
+
+            foreach ($this->csvFileReader->getRows($filePath, $options) as $row) {
                 if (!$row) {
                     break;
                 }

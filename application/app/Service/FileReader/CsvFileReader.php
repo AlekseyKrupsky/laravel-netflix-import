@@ -2,40 +2,30 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\FileReader;
 
 use App\Exception\ImportFileReadException;
 
-class CsvFileReader
+class CsvFileReader implements FileReaderInterface
 {
     protected const DEFAULT_DELIMITER = ',';
     protected const DEFAULT_ROW_LENGTH = 4096;
 
     private mixed $handle = null;
 
-    public function openFile(string $filePath): void
+    public function getRows(string $filePath, array $options = []): \Generator
     {
         $this->handle = fopen($filePath, 'r');
 
         if ($this->handle === false) {
             throw new ImportFileReadException(sprintf('Unable to open file: %s', $filePath));
         }
-    }
 
-    public function skipLine(): void
-    {
-        if (!$this->handle) {
-            throw new ImportFileReadException('Unable to skip line. Handle is not set.');
+        if ($options['skip_headers'] ?? false) {
+            fgetcsv($this->handle);
         }
 
-        fgetcsv($this->handle);
-    }
-
-    public function getRows(string $delimiter = self::DEFAULT_DELIMITER): \Generator
-    {
-        if (!$this->handle) {
-            throw new ImportFileReadException('Unable to get row. Handle is not set.');
-        }
+        $delimiter = $options['delimiter'] ?? self::DEFAULT_DELIMITER;
 
         while (feof($this->handle) === false) {
             yield fgetcsv($this->handle, self::DEFAULT_ROW_LENGTH, $delimiter);
